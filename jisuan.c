@@ -21,7 +21,7 @@ char popStack(cStack *stack);
 float getTopf(fStack *stack);
 char getTop(cStack *stack);
 void calculate();
-int check(int a);//校验运算符和左括号后面是否为数字
+int check(int a);//校验格式是否正确  校验运算符和左括号后面是否为数字
 int isNum(char c);//判断是否是数字
 int isOperator(char c);
 int isGreater(char s,char cur){
@@ -42,12 +42,21 @@ char c[64];
 int main()
 {
 	int greater=0;
-	int i = 0;
+	int i = 0;//控制输入
 	int flag = 0;
 	fstack.top = 0;
 	cstack.top = 0;
 	while((c[i++]=getch())!='#'){
-		printf("%d->%c \n",i-1,c[i-1]);
+		printf("[%d]->%c \n",i-1,c[i-1]);
+	}
+	//控制校验
+	int k = 0;
+	while(c[k]!='#'){
+		if(check(k)==0){
+			printf("%s","wrong format!!!");
+			return 0;
+		}
+		k++;
 	}
 	int j = 0;
 	while(c[j]!='#'){
@@ -76,7 +85,6 @@ int main()
 		}
 		//若是左界限符，如符号栈，右界限符直到弹出左界限符为止
 		if(c[j]=='('||c[j]=='['){
-			check(j);
 			pushStack(&cstack,c[j]);
 		}else if(c[j]==')'){
 			while(getTop(&cstack)!='('&&(getTop(&cstack)!='0')){
@@ -101,7 +109,6 @@ int main()
 		//同时从操作数栈弹出两个数字计算，完事压回操作数栈
 		if(c[j]=='+'||c[j]=='-'||c[j]=='*'||c[j]=='/'){
 			//运算符后面不是数字,则报格式错误
-			check(j);
 			while(isGreater(getTop(&cstack),c[j])){
 				calculate();
 			}
@@ -130,12 +137,25 @@ int check(int a){
 		}
 	}
 	//*:# * ) ]错误
-	//(或[:# * ) [ ] 不是数字就错误
-	//)或]:数字 左括号错误
-	//数字:数字 左括号 
-	if(isNum(c[b])==0){
-		printf("%s","wrong format!!!");
+	if(isOperator(c[a])){
+		if(c[b]=='#'||c[b]=='*'||c[b]==')')
 		return 0;
+	}
+	//(或[:# * ) [ ] 不是数字就错误
+	if(c[a]=='('||c[a]=='['){
+		if(c[b]=='#'||c[b]=='*'||c[b]==')'||c[b]==']')
+		return 0;
+	}
+	//)或]:数字 左括号错误
+	if(c[a]==')'||c[a]==']'){
+		if(isNum(c[b])||c[b]=='('||c[b]=='[')
+		return 0;
+	}
+	//数字:数字 左括号 
+	if(isNum(c[a])){
+		if(isNum(c[b])==1||c[b]=='('||c[b]=='['){
+			return 0;
+		}
 	}
 	return 1;
 }
